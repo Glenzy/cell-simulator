@@ -1,8 +1,5 @@
 .App {
   text-align: center;
-}
-
-.App-header {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
@@ -11,24 +8,30 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  h1 {font-size:45px;}
 }
 
+
 .flex-grid-container {
-  width: 15rem;
-  height: 15rem;
+  width: 30rem;
+  height: 30rem;
   display: flex;
   justify-content: center;
   flex-flow: row wrap;
-  margin: 1%;
+  margin: 20px auto;
 
   .flex-grid {
     border: 1px #e7e7e7 solid;
     background: #fff;
     height: 22px;
-    flex: 0 0 9%;
+    width: 24px;
 
     &.active {
       background: #000;
     }
   }
+}
+
+.button {
+  margin:0 5px;
 }
