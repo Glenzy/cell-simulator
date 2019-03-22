@@ -68,16 +68,19 @@ const useSetSimulation = () => {
       const dir = directions[i];
       let y1 = y + dir[0];
       let x1 = x + dir[1];
-      cellArray && cellArray.map((cell: ICell) => {
-        if (cell.x === x && cell.y === y) {
-          return
-        }
-        if (cell.x === x1 && cell.y === y1 && cell.isActive) {
+    }
+
+    cellArray && cellArray.map((cell: ICell) => {
+      if (cell.x === x && cell.y === y) {
+        return
+      }
+      if (cell.isActive) {
+        if (cell.x === x + 1 || cell.x === x - 1 || cell.x === x && cell.y === y + 1 || cell.y === y - 1 || cell.y === y) {
           return neighbors++;
         }
-        return
-      });
-    }
+      }
+      return
+    });
     return neighbors;
   }
 
