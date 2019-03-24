@@ -4,42 +4,49 @@ import {
 } from 'react';
 import { IState } from '../interfaces/state-interface';
 import { ICell } from './../interfaces/cell-interface';
+import { number } from 'prop-types';
 
 const useSetSimulation = () => {
 
   const [cellArray, setCellData] = useState<IState>();
   const [cellsSet, setCellsSet] = useState()
+  const [simulationStarted, setStartSimulation] = useState(false)
+
 
   const generateCellData = () => {
     let cellArray = [];
     let key = 0;
     for (let i = 0; i < 20; i++) {
       for (let j = 0; j < 20; j++) {
-        cellArray.push({ id: `${key}`, isActive: false, x: j, y: i, });
+        cellArray.push({ id: key, isActive: false, x: j, y: i, });
         key++
       }
       setCellData(cellArray as IState);
     }
   }
-  const updateCells = (x: number | undefined, y: number | undefined, type: string) => {
+
+
+  const updateCells = (id: number | undefined, type: string) => {
 
     const upDatedCellArray =
-      cellArray && cellArray.map((item) => {
-        if (type === 'simulation') {
-
+      cellArray && cellArray.map((cell) => {
+        if (type === 'start-btn') {
+          setStartSimulation(true);
+          runSimulation(cell);
         }
 
         if (type === 'selected') {
-          if (item.y === y && item.x === x) {
-            item.isActive = true;
-            console.log(checkNeighbours(item.x, item.y));
+          if (cell.id === id) {
+            //console.log('cell ID', cell.id);
+            cell.isActive = true;
+            console.log(checkNeighbours(cell.id));
           }
         }
         if (type === 'reset-btn') {
-          item.isActive = false;
+          cell.isActive = false;
         }
 
-        return item;
+        return cell;
       });
     setCellData(upDatedCellArray as IState);
   }
@@ -49,38 +56,48 @@ const useSetSimulation = () => {
       generateCellData();
       setCellsSet(true);
     }
+    if (simulationStarted) {
+      updateCells(undefined, 'simulation');
+    }
   });
 
-  const checkNeighbours = (x: number, y: number) => {
-    let neighbors = 0;
-
-    const directions = [
-      [-1, -1],
-      [-1, 0],
-      [-1, 1],
-      [0, 1],
-      [1, 1],
-      [1, 0],
-      [1, -1],
-      [0, -1]
-    ];
-    for (let i = 0; i < directions.length; i++) {
-      const dir = directions[i];
-      let y1 = y + dir[0];
-      let x1 = x + dir[1];
+  const runSimulation = (cell: any) => {
+    if (cell.isActive === true && checkNeighbours(cell.id) === 2 || checkNeighbours(cell.id) === 3) {
+      return cell;
     }
+    if (cell.isActive === false && checkNeighbours(cell.id) === 3) {
+      cell.isActive === true;
+      return cell;
+    }
+    if (cell.isActive === true && checkNeighbours(cell.id) <= 2) {
+      cell.isActive === false;
+      return cell;
+    }
+    if (cell.isActive === true && checkNeighbours(cell.id) > 3) {
+      cell.isActive === false;
+      return cell;
+    }
+    return cell;
+  }
 
-    cellArray && cellArray.map((cell: ICell) => {
-      if (cell.x === x && cell.y === y) {
-        return
+  const checkNeighbours = (id: number) => {
+    let neighbors = 0;
+    if (cellArray && cellArray[id]) {
+      //top
+      if (cellArray[id - 20] && cellArray[id - 20].isActive) {
+        neighbors++
       }
-      if (cell.isActive) {
-        if (cell.x === x + 1 || cell.x === x - 1 || cell.x === x && cell.y === y + 1 || cell.y === y - 1 || cell.y === y) {
-          return neighbors++;
-        }
+      //bottom
+      if (cellArray[id + 20] && cellArray[id + 20].isActive) {
+        neighbors++
       }
-      return
-    });
+      if (cellArray[id - 1] && cellArray[id - 1].isActive) {
+        neighbors++
+      }
+      if (cellArray[id + 1] && cellArray[id + 1].isActive) {
+        neighbors++
+      }
+    }
     return neighbors;
   }
 

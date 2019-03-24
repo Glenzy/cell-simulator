@@ -6,7 +6,7 @@ const Cell = (Props: ICell) => {
     <div
       data-x={Props.x}
       data-y={Props.y}
-      data-id={`${Props.id}`}
+      data-id={Props.id}
       className={"flex-grid " + (Props.isActive ? "active" : "")}
       onClick={Props.ClickHandler}
     />

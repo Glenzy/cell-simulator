@@ -3,5 +3,5 @@ export interface ICell {
   x: number,
   y: number,
   isActive?: boolean | undefined,
-  id: string | undefined
+  id: number
 }

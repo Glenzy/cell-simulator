@@ -11,13 +11,12 @@ const App: React.FC<IState | {}> = () => {
   const { cellArray, updateCells } = useSetSimulation();
 
   const handleCellClick = (event: React.MouseEvent<HTMLElement>) => {
-    const x = Number((event.target as HTMLInputElement).dataset.x);
-    const y = Number((event.target as HTMLInputElement).dataset.y);
-    updateCells(x, y, 'selected');
+    const id = Number((event.target as HTMLInputElement).dataset.id);
+    updateCells(id, 'selected');
   }
   const handleButtonClick = (event: React.MouseEvent<HTMLElement>) => {
     const buttonType = (event.target as HTMLInputElement).name;
-    updateCells(undefined, undefined, buttonType);
+    updateCells(undefined, buttonType);
   }
 
   return (
