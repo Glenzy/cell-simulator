@@ -3,14 +3,12 @@ import {
   useEffect
 } from 'react';
 import { IState } from '../interfaces/state-interface';
-import { ICell } from './../interfaces/cell-interface';
-import { number } from 'prop-types';
 
 const useSetSimulation = () => {
 
   const [cellArray, setCellData] = useState<IState>();
   const [cellsSet, setCellsSet] = useState()
-  const [simulationStarted, setStartSimulation] = useState(false)
+
 
 
   const generateCellData = () => {
@@ -26,29 +24,43 @@ const useSetSimulation = () => {
   }
 
 
-  const updateCells = (id: number | undefined, type: string) => {
+  let timeoutHandler: any;
 
+  const stopAnimation = () => {
+    console.log('Clearing', timeoutHandler);
+    window.clearTimeout(timeoutHandler);
+    return timeoutHandler = null;
+  };
+
+  const handleAnimation = (type: string) => {
+    if (type === 'start-btn' || type === 'simulation') {
+      return timeoutHandler = window.setTimeout(() => {
+        return updateCells(undefined, 'simulation');
+      }, 500);
+    }
+    if (type === 'reset-btn') {
+      return stopAnimation();
+    }
+  }
+
+  const updateCells = (id: number | undefined, type: string) => {
     const upDatedCellArray =
       cellArray && cellArray.map((cell) => {
-        if (type === 'start-btn') {
-          setStartSimulation(true);
-          runSimulation(cell);
+        if (type === "simulation") {
+          cell = runSimulation(cell);
         }
-
         if (type === 'selected') {
           if (cell.id === id) {
-            //console.log('cell ID', cell.id);
-            cell.isActive = true;
-            console.log(checkNeighbours(cell.id));
+            cell.isActive = !cell.isActive;
           }
         }
         if (type === 'reset-btn') {
           cell.isActive = false;
         }
-
         return cell;
       });
     setCellData(upDatedCellArray as IState);
+    handleAnimation(type);
   }
 
   useEffect(() => {
@@ -56,49 +68,43 @@ const useSetSimulation = () => {
       generateCellData();
       setCellsSet(true);
     }
-    if (simulationStarted) {
-      updateCells(undefined, 'simulation');
-    }
   });
 
   const runSimulation = (cell: any) => {
-    if (cell.isActive === true && checkNeighbours(cell.id) === 2 || checkNeighbours(cell.id) === 3) {
-      return cell;
-    }
-    if (cell.isActive === false && checkNeighbours(cell.id) === 3) {
-      cell.isActive === true;
-      return cell;
-    }
+    //case A Cell with fewer than two live neighbours dies of under-population.
     if (cell.isActive === true && checkNeighbours(cell.id) <= 2) {
-      cell.isActive === false;
+      cell.isActive = false;
       return cell;
     }
+    // case A Cell with 2 or 3 live neighbours lives on to the next generation.
+    if (cell.isActive === true && checkNeighbours(cell.id) === 2 || cell.isActive === true && checkNeighbours(cell.id) === 3) {
+      return cell;
+    }
+    // case A Cell with more than 3 live neighbours dies of overcrowding.
     if (cell.isActive === true && checkNeighbours(cell.id) > 3) {
-      cell.isActive === false;
+      cell.isActive = false;
+      return cell;
+    }
+    // case An empty Cell with exactly 3 live neighbours "comes to life".
+    if (cell.isActive === false && checkNeighbours(cell.id) === 3) {
+      cell.isActive = true;
       return cell;
     }
     return cell;
   }
 
   const checkNeighbours = (id: number) => {
-    let neighbors = 0;
+    let neighbours = 0;
+    const directions = [-20, 20, -1, 1, 21, -21, 19, -19];
     if (cellArray && cellArray[id]) {
-      //top
-      if (cellArray[id - 20] && cellArray[id - 20].isActive) {
-        neighbors++
-      }
-      //bottom
-      if (cellArray[id + 20] && cellArray[id + 20].isActive) {
-        neighbors++
-      }
-      if (cellArray[id - 1] && cellArray[id - 1].isActive) {
-        neighbors++
-      }
-      if (cellArray[id + 1] && cellArray[id + 1].isActive) {
-        neighbors++
+      for (let i = 0; i <= directions.length; i++) {
+        let direction = directions[i];
+        if (cellArray[id + direction] && cellArray[id + direction].isActive) {
+          neighbours++;
+        }
       }
     }
-    return neighbors;
+    return neighbours;
   }
 
 
