@@ -10,7 +10,6 @@ const useSetSimulation = () => {
   const [cellsSet, setCellsSet] = useState()
 
 
-
   const generateCellData = () => {
     let cellArray = [];
     let key = 0;
@@ -24,25 +23,6 @@ const useSetSimulation = () => {
   }
 
 
-  let timeoutHandler: any;
-
-  const stopAnimation = () => {
-    console.log('Clearing', timeoutHandler);
-    window.clearTimeout(timeoutHandler);
-    return timeoutHandler = null;
-  };
-
-  const handleAnimation = (type: string) => {
-    if (type === 'start-btn' || type === 'simulation') {
-      return timeoutHandler = window.setTimeout(() => {
-        return updateCells(undefined, 'simulation');
-      }, 500);
-    }
-    if (type === 'reset-btn') {
-      return stopAnimation();
-    }
-  }
-
   const updateCells = (id: number | undefined, type: string) => {
     const upDatedCellArray =
       cellArray && cellArray.map((cell) => {
@@ -55,12 +35,11 @@ const useSetSimulation = () => {
           }
         }
         if (type === 'reset-btn') {
-          cell.isActive = false;
+          //cell.isActive = false;
         }
         return cell;
       });
     setCellData(upDatedCellArray as IState);
-    handleAnimation(type);
   }
 
   useEffect(() => {
@@ -111,7 +90,7 @@ const useSetSimulation = () => {
 
   return {
     cellArray,
-    updateCells
+    updateCells,
   }
 }
 

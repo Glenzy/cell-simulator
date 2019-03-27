@@ -8,16 +8,52 @@ import './App.scss';
 import { IState } from './interfaces/state-interface';
 
 const App: React.FC<IState | {}> = () => {
+
   const { cellArray, updateCells } = useSetSimulation();
+  const [animationRunning, setAnimationRunning] = React.useState(false);
+
+  let requestID: number;
+  let prevRequestID: number = 0;
+
+  function startAnimtion() {
+    requestID = requestAnimationFrame(function (time) {
+      startCellUpdates(requestID);
+    });
+  }
+
+  function startCellUpdates(requestID: number) {
+    console.log('StartCellUpdate', requestID);
+    console.log('##########################', prevRequestID);
+    console.log('##########################', animationRunning);
+    if (requestID > (prevRequestID + 10)) {
+      prevRequestID = requestID;
+      updateCells(undefined, 'simulation');
+    }
+    if (animationRunning) {
+      return startAnimtion();
+    }
+    return
+  }
+
 
   const handleCellClick = (event: React.MouseEvent<HTMLElement>) => {
     const id = Number((event.target as HTMLInputElement).dataset.id);
     updateCells(id, 'selected');
   }
+
+
   const handleButtonClick = (event: React.MouseEvent<HTMLElement>) => {
     const buttonType = (event.target as HTMLInputElement).name;
+    if (buttonType === 'start-btn') {
+      setAnimationRunning(true)
+      startAnimtion()
+    }
+    if (buttonType === 'reset-btn') {
+      return setAnimationRunning(false)
+    }
     updateCells(undefined, buttonType);
   }
+
 
   return (
     <div className="App">
