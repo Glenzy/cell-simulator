@@ -1,7 +1,8 @@
 import * as React from 'react';
 import Cell from './components/cell/cell';
 import Button from './components/button/button';
-import useSetSimulation from './hooks/useSetSimulation'
+import useSetSimulation from './hooks/useSetSimulation';
+import useInterval from './hooks/useInterval';
 
 
 import './App.scss';
@@ -12,28 +13,10 @@ const App: React.FC<IState | {}> = () => {
   const { cellArray, updateCells } = useSetSimulation();
   const [animationRunning, setAnimationRunning] = React.useState(false);
 
-  let requestID: number;
-  let prevRequestID: number = 0;
 
-  function startAnimtion() {
-    requestID = requestAnimationFrame(function (time) {
-      startCellUpdates(requestID);
-    });
-  }
-
-  function startCellUpdates(requestID: number) {
-    console.log('StartCellUpdate', requestID);
-    console.log('##########################', prevRequestID);
-    console.log('##########################', animationRunning);
-    if (requestID > (prevRequestID + 10)) {
-      prevRequestID = requestID;
-      updateCells(undefined, 'simulation');
-    }
-    if (animationRunning) {
-      return startAnimtion();
-    }
-    return
-  }
+  useInterval(() => {
+    updateCells(undefined, 'simulation');
+  }, animationRunning ? 1000 : null);
 
 
   const handleCellClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -45,11 +28,10 @@ const App: React.FC<IState | {}> = () => {
   const handleButtonClick = (event: React.MouseEvent<HTMLElement>) => {
     const buttonType = (event.target as HTMLInputElement).name;
     if (buttonType === 'start-btn') {
-      setAnimationRunning(true)
-      startAnimtion()
+      return useInterval()
     }
     if (buttonType === 'reset-btn') {
-      return setAnimationRunning(false)
+      return useInterval()
     }
     updateCells(undefined, buttonType);
   }
