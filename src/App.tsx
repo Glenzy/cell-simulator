@@ -16,7 +16,7 @@ const App: React.FC<IState | {}> = () => {
 
   useInterval(() => {
     updateCells(undefined, 'simulation');
-  }, animationRunning ? 1000 : null);
+  }, animationRunning ? 500 : null);
 
 
   const handleCellClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -28,10 +28,10 @@ const App: React.FC<IState | {}> = () => {
   const handleButtonClick = (event: React.MouseEvent<HTMLElement>) => {
     const buttonType = (event.target as HTMLInputElement).name;
     if (buttonType === 'start-btn') {
-      return useInterval()
+      setAnimationRunning(true)
     }
     if (buttonType === 'reset-btn') {
-      return useInterval()
+      setAnimationRunning(false)
     }
     updateCells(undefined, buttonType);
   }
